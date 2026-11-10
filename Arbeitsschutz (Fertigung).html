@@ -17,7 +17,7 @@ function rS(){sw('W');document.getElementById('fn').value=uF||'';document.getEle
 function mC(){var s=encodeURIComponent('Zertifikat Arbeitsschutz (Fertigung) - '+uF+' '+uL);var b=encodeURIComponent(uF+' '+uL+' (Abteilung: '+uD+') hat die Arbeitsschutz-Unterweisung (Fertigung) '+new Date().getFullYear()+' bestanden. Ergebnis: '+sc+'/10.\nProTecBird GmbH');window.open('mailto:?subject='+s+'&body='+b)}
 <script>
 (function(){
-var T='fertigung',PU=window.location.href.split('/').slice(0,-1).join('/')+'/portal.html';
+var T='dsgvo',PU=window.location.href.split('/').slice(0,-1).join('/')+'/portal.html';
 function gP(){var p={},s=window.location.search.substring(1);if(!s)return p;var a=s.split('&');for(var i=0;i<a.length;i++){var kv=a[i].split('=');if(kv.length===2)p[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]);}return p;}
 function bP(o){var r=[];for(var k in o)if(o.hasOwnProperty(k)&&o[k])r.push(encodeURIComponent(k)+'='+encodeURIComponent(o[k]));return r.join('&');}
 var p=gP(),fr=!!(p.ptb_fn&&p.ptb_ln&&p.ptb_dp&&p.ptb_loc);
