@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ProTecBird Admin-Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a202c}
+.hd{background:linear-gradient(135deg,#1a365d,#2563eb);color:#fff;padding:20px 30px;display:flex;align-items:center;justify-content:space-between}
+.hd h1{font-size:1.3em;font-weight:600}
+.hd .sub{font-size:.85em;opacity:.8;margin-top:2px}
+.hd .lo{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.85em}
+.hd .lo:hover{background:rgba(255,255,255,.25)}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+.login{max-width:400px;margin:80px auto;background:#fff;border-radius:12px;padding:40px;box-shadow:0 2px 12px rgba(0,0,0,.08);text-align:center}
+.login h2{margin-bottom:8px;color:#1a365d}
+.login p{color:#718096;margin-bottom:24px;font-size:.9em}
+.login input{width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:8px;font-size:1em;margin-bottom:16px}
+.login input:focus{outline:none;border-color:#2563eb}
+.login button{width:100%;padding:12px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:1em;font-weight:600;cursor:pointer}
+.login button:hover{background:#1d4ed8}
+.login .err{color:#c53030;margin-top:12px;font-size:.9em;display:none}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.card{background:#fff;border-radius:10px;padding:20px;box-shadow:0 1px 6px rgba(0,0,0,.06);text-align:center}
+.card .num{font-size:2em;font-weight:700;color:#2563eb}
+.card .lbl{font-size:.85em;color:#718096;margin-top:4px}
+.card.green .num{color:#2d8a4e}
+.card.orange .num{color:#c05621}
+.card.red .num{color:#c53030}
+.filters{background:#fff;border-radius:10px;padding:16px 20px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.filters label{font-size:.85em;color:#4a5568;font-weight:600}
+.filters select,.filters input{padding:8px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:.9em}
+.filters select{min-width:160px}
+.btn{padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.85em;font-weight:600}
+.btn:hover{background:#1d4ed8}
+.btn.sec{background:#718096}
+.btn.sec:hover{background:#4a5568}
+.btn.grn{background:#2d8a4e}
+.btn.grn:hover{background:#236b3e}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+th{background:#f7fafc;padding:12px 16px;text-align:left;font-size:.8em;text-transform:uppercase;color:#4a5568;border-bottom:2px solid #e2e8f0}
+td{padding:10px 16px;border-bottom:1px solid #f0f0f0;font-size:.9em}
+tr:hover td{background:#f7fafc}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.8em;font-weight:600}
+.badge.ok{background:#c6f6d5;color:#22543d}
+.badge.no{background:#fed7d7;color:#742a2a}
+.badge.wait{background:#fefcbf;color:#744210}
+.empty{text-align:center;padding:40px;color:#a0aec0;font-size:1.1em}
+.loading{text-align:center;padding:40px;color:#718096}
+.progress-bar{width:100%;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width .3s}
+.mt{margin-top:20px}
+.mb{margin-bottom:20px}
+.fr{float:right}
+.gap8{gap:8px;display:flex}
+@media(max-width:768px){.filters{flex-direction:column}.cards{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div id="loginView">
+<div class="login">
+<h2>&#x1F512; Admin-Dashboard</h2>
+<p>ProTecBird Trainingsportal</p>
+<input type="password" id="pwInput" placeholder="Admin-Passwort eingeben" onkeyup="if(event.key==='Enter')doLogin()">
+<button onclick="doLogin()">Anmelden</button>
+<div class="err" id="loginErr">Falsches Passwort</div>
+</div>
+</div>
+
+<div id="dashView" style="display:none">
+<div class="hd">
+<div>
+<h1>&#x1F4CA; ProTecBird Admin-Dashboard</h1>
+<div class="sub">Trainings-Uebersicht fuer alle Mitarbeitenden</div>
+</div>
+<div class="gap8">
+<button class="lo" onclick="loadData()">&#x1F504; Aktualisieren</button>
+<button class="lo" onclick="exportCSV()">&#x1F4E5; CSV Export</button>
+<button class="lo" onclick="doLogout()">Abmelden</button>
+</div>
+</div>
+
+<div class="wrap">
+<div class="cards" id="statCards"></div>
+
+<div class="filters">
+<label>Filter:</label>
+<select id="fTraining" onchange="renderTable()"><option value="">Alle Trainings</option></select>
+<select id="fOrt" onchange="renderTable()"><option value="">Alle Standorte</option></select>
+<select id="fAbt" onchange="renderTable()"><option value="">Alle Abteilungen</option></select>
+<input type="text" id="fName" placeholder="Name suchen..." oninput="renderTable()">
+</div>
+
+<div id="tableWrap"></div>
+
+<div class="mt mb" style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 1px 6px rgba(0,0,0,.06)">
+<h3 style="margin-bottom:12px">&#x1F4CA; Fortschritt nach Mitarbeitenden</h3>
+<div id="progressView"></div>
+</div>
+</div>
+</div>
+
+<script>
+var API='https://script.google.com/macros/s/AKfycbzAuwGyzfJfvI6422aIQV6GU_5vHymUN985ALbJPM5MGdkGFh0IhkwiASt8684CTE7LFg/exec';
+var PW='',rawData=[],TRAININGS=['Cyber-Hygiene-Check-Up','Arbeitsschutz (Buero)','Arbeitsschutz (Fertigung)','DSGVO','Qualitaetsmanagement ISO 9001'];
+
+function doLogin(){
+PW=document.getElementById('pwInput').value;
+document.getElementById('loginErr').style.display='none';
+loadData();
+}
+
+function doLogout(){
+PW='';rawData=[];
+document.getElementById('dashView').style.display='none';
+document.getElementById('loginView').style.display='block';
+document.getElementById('pwInput').value='';
+}
+
+function loadData(){
+document.getElementById('tableWrap').innerHTML='<div class="loading">&#x23F3; Daten werden geladen...</div>';
+fetch(API+'?pw='+encodeURIComponent(PW))
+.then(function(r){return r.json();})
+.then(function(d){
+if(d.status==='denied'){
+document.getElementById('loginErr').style.display='block';
+return;
+}
+document.getElementById('loginView').style.display='none';
+document.getElementById('dashView').style.display='block';
+rawData=d.data||[];
+buildFilters();
+renderCards();
+renderTable();
+renderProgress();
+})
+.catch(function(e){
+document.getElementById('tableWrap').innerHTML='<div class="empty">Fehler beim Laden: '+e.message+'</div>';
+});
+}
+
+function buildFilters(){
+var ts=new Set(),os=new Set(),as=new Set();
+for(var i=0;i<rawData.length;i++){
+var r=rawData[i];
+if(r.Training)ts.add(r.Training);
+if(r.Arbeitsort)os.add(r.Arbeitsort);
+if(r.Abteilung)as.add(r.Abteilung);
+}
+fillSelect('fTraining',ts,'Alle Trainings');
+fillSelect('fOrt',os,'Alle Standorte');
+fillSelect('fAbt',as,'Alle Abteilungen');
+}
+
+function fillSelect(id,items,def){
+var sel=document.getElementById(id),val=sel.value;
+sel.innerHTML='<option value="">'+def+'</option>';
+var arr=Array.from(items).sort();
+for(var i=0;i<arr.length;i++){
+var o=document.createElement('option');o.value=arr[i];o.textContent=arr[i];
+sel.appendChild(o);
+}
+sel.value=val;
+}
+
+function getFiltered(){
+var ft=document.getElementById('fTraining').value;
+var fo=document.getElementById('fOrt').value;
+var fa=document.getElementById('fAbt').value;
+var fn=document.getElementById('fName').value.toLowerCase();
+var out=[];
+for(var i=0;i<rawData.length;i++){
+var r=rawData[i];
+if(ft&&r.Training!==ft)continue;
+if(fo&&r.Arbeitsort!==fo)continue;
+if(fa&&r.Abteilung!==fa)continue;
+if(fn){var name=((r.Vorname||'')+' '+(r.Nachname||'')).toLowerCase();if(name.indexOf(fn)<0)continue;}
+out.push(r);
+}
+return out;
+}
+
+function renderCards(){
+var total=rawData.length;
+var users={};
+for(var i=0;i<rawData.length;i++){
+var r=rawData[i],key=(r.Vorname||'')+'|'+(r.Nachname||'')+'|'+(r.Abteilung||'');
+if(!users[key])users[key]={trainings:new Set(),ort:r.Arbeitsort||''};
+users[key].trainings.add(r.Training);
+}
+var uKeys=Object.keys(users),complete=0;
+for(var i=0;i<uKeys.length;i++){
+var u=users[uKeys[i]],needed=getNeededTrainings(u.ort);
+var done=0;for(var j=0;j<needed.length;j++){if(u.trainings.has(needed[j]))done++;}
+if(done>=needed.length)complete++;
+}
+var h='';
+h+='<div class="card"><div class="num">'+total+'</div><div class="lbl">Eintraege gesamt</div></div>';
+h+='<div class="card"><div class="num">'+uKeys.length+'</div><div class="lbl">Mitarbeitende</div></div>';
+h+='<div class="card green"><div class="num">'+complete+'</div><div class="lbl">Alle Trainings komplett</div></div>';
+h+='<div class="card orange"><div class="num">'+(uKeys.length-complete)+'</div><div class="lbl">Trainings offen</div></div>';
+document.getElementById('statCards').innerHTML=h;
+}
+
+function getNeededTrainings(ort){
+if(ort==='Oyten')return['Cyber-Hygiene-Check-Up','Arbeitsschutz (Fertigung)','DSGVO','Qualitaetsmanagement ISO 9001'];
+return['Cyber-Hygiene-Check-Up','Arbeitsschutz (Buero)','DSGVO','Qualitaetsmanagement ISO 9001'];
+}
+
+function renderTable(){
+var data=getFiltered();
+if(data.length===0){document.getElementById('tableWrap').innerHTML='<div class="empty">Keine Eintraege gefunden</div>';return;}
+var h='<table><tr><th>Vorname</th><th>Nachname</th><th>Abteilung</th><th>Arbeitsort</th><th>Training</th><th>Ergebnis</th><th>Datum</th></tr>';
+for(var i=0;i<data.length;i++){
+var r=data[i];
+h+='<tr>';
+h+='<td>'+(r.Vorname||'-')+'</td>';
+h+='<td>'+(r.Nachname||'-')+'</td>';
+h+='<td>'+(r.Abteilung||'-')+'</td>';
+h+='<td>'+(r.Arbeitsort||'-')+'</td>';
+h+='<td>'+(r.Training||'-')+'</td>';
+h+='<td><span class="badge ok">'+(r.Ergebnis||'-')+'</span></td>';
+h+='<td>'+(r.Datum||'-')+'</td>';
+h+='</tr>';
+}
+h+='</table>';
+document.getElementById('tableWrap').innerHTML=h;
+}
+
+function renderProgress(){
+var users={};
+for(var i=0;i<rawData.length;i++){
+var r=rawData[i],key=(r.Vorname||'')+'|'+(r.Nachname||'')+'|'+(r.Abteilung||'');
+if(!users[key])users[key]={fn:r.Vorname||'',ln:r.Nachname||'',abt:r.Abteilung||'',ort:r.Arbeitsort||'',trainings:new Set()};
+users[key].trainings.add(r.Training);
+}
+var uKeys=Object.keys(users).sort();
+if(uKeys.length===0){document.getElementById('progressView').innerHTML='<div class="empty">Noch keine Daten</div>';return;}
+var h='';
+for(var i=0;i<uKeys.length;i++){
+var u=users[uKeys[i]],needed=getNeededTrainings(u.ort);
+var done=0;for(var j=0;j<needed.length;j++){if(u.trainings.has(needed[j]))done++;}
+var pct=Math.round(done/needed.length*100);
+var col=pct===100?'#2d8a4e':pct>=50?'#c05621':'#c53030';
+h+='<div style="margin-bottom:12px;padding:10px 0;border-bottom:1px solid #f0f0f0">';
+h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+h+='<strong>'+u.fn+' '+u.ln+'</strong>';
+h+='<span style="font-size:.85em;color:#718096">'+u.abt+' | '+u.ort+' | '+done+'/'+needed.length+'</span>';
+h+='</div>';
+h+='<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%;background:'+col+'"></div></div>';
+h+='<div style="font-size:.8em;color:#a0aec0;margin-top:4px">';
+for(var j=0;j<needed.length;j++){
+var isDone=u.trainings.has(needed[j]);
+h+=(isDone?'&#x2705;':'&#x274C;')+' '+needed[j]+' &nbsp; ';
+}
+h+='</div></div>';
+}
+document.getElementById('progressView').innerHTML=h;
+}
+
+function exportCSV(){
+if(rawData.length===0){alert('Keine Daten zum Exportieren');return;}
+var csv='Vorname;Nachname;Email;Abteilung;Arbeitsort;Training;Ergebnis;Datum\n';
+for(var i=0;i<rawData.length;i++){
+var r=rawData[i];
+csv+=(r.Vorname||'')+';'+(r.Nachname||'')+';'+(r.Email||'')+';'+(r.Abteilung||'')+';'+(r.Arbeitsort||'')+';'+(r.Training||'')+';'+(r.Ergebnis||'')+';'+(r.Datum||'')+'\n';
+}
+var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ProTecBird_Trainings_Export_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+</script>
+</body>
+</html>
+
