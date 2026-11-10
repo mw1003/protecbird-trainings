@@ -16,6 +16,30 @@ function sC(){sw('CS');var n=new Date(),y=n.getFullYear();var mo=['Januar','Febr
 function rS(){sw('W');document.getElementById('fn').value=uF||'';document.getElementById('ln').value=uL||'';document.getElementById('dp').value=uD||''}
 function mC(){var s=encodeURIComponent('Zertifikat ISO 9001 - '+uF+' '+uL);var b=encodeURIComponent(uF+' '+uL+' (Abteilung: '+uD+') hat die ISO 9001-Unterweisung '+new Date().getFullYear()+' bestanden. Ergebnis: '+sc+'/10.\nProTecBird GmbH');window.open('mailto:?subject='+s+'&body='+b)}
 <script>
-(function(){var T='iso9001',BASE=window.location.href.split('/').slice(0,-1).join('/')+'/portal.html';function gP(){var p={},s=window.location.search.substring(1);if(!s)return p;var a=s.split('&');for(var i=0;i<a.length;i++){var kv=a[i].split('=');if(kv.length===2)p[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1])}return p}function bP(o){var r=[];for(var k in o)if(o.hasOwnProperty(k)&&o[k])r.push(encodeURIComponent(k)+'='+encodeURIComponent(o[k]));return r.join('&')}var p=gP(),fr=!!(p.ptb_fn&&p.ptb_ln&&p.ptb_dp&&p.ptb_loc);if(fr){var fn=document.getElementById('fn'),ln=document.getElementById('ln'),dp=document.getElementById('dp');if(fn){fn.value=p.ptb_fn;fn.readOnly=true;fn.style.background='#f0f4f8'}if(ln){ln.value=p.ptb_ln;ln.readOnly=true;ln.style.background='#f0f4f8'}if(dp){dp.value=p.ptb_dp;dp.readOnly=true;dp.style.background='#f0f4f8'}}window.goPortal=function(passed){var o={ptb_fn:p.ptb_fn||'',ptb_ln:p.ptb_ln||'',ptb_dp:p.ptb_dp||'',ptb_loc:p.ptb_loc||'',ptb_em:p.ptb_em||'',ptb_done:p.ptb_done||''};if(passed!==undefined){o.ptb_result=T;o.ptb_passed=passed?'true':'false'}window.location.href=BASE+'?'+bP(o)};var origSR=window.sR;window.sR=function(){origSR();if(fr){var passed=window.sc>=8;var rB=document.getElementById('rB');if(rB){var d=document.createElement('div');d.style.marginTop='12px';d.innerHTML='<button onclick="goPortal('+passed+')" style="display:inline-block;padding:11px 28px;border:none;border-radius:8px;font-size:.95em;font-weight:600;cursor:pointer;background:#1a56a8;color:#fff">&#x2190; Zurueck zum Trainingsportal</button>';rB.appendChild(d)}}};})();
+(function(){
+var T='iso9001',PU=window.location.href.split('/').slice(0,-1).join('/')+'/portal.html';
+function gP(){var p={},s=window.location.search.substring(1);if(!s)return p;var a=s.split('&');for(var i=0;i<a.length;i++){var kv=a[i].split('=');if(kv.length===2)p[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]);}return p;}
+function bP(o){var r=[];for(var k in o)if(o.hasOwnProperty(k)&&o[k])r.push(encodeURIComponent(k)+'='+encodeURIComponent(o[k]));return r.join('&');}
+var p=gP(),fr=!!(p.ptb_fn&&p.ptb_ln&&p.ptb_dp&&p.ptb_loc);
+if(fr){var fn=document.getElementById('fn'),ln=document.getElementById('ln'),dp=document.getElementById('dp');if(fn){fn.value=p.ptb_fn;fn.readOnly=true;fn.style.background='#f0f4f8'}if(ln){ln.value=p.ptb_ln;ln.readOnly=true;ln.style.background='#f0f4f8'}if(dp){dp.value=p.ptb_dp;dp.readOnly=true;dp.style.background='#f0f4f8'}}
+function goBack(passed){var o={ptb_fn:p.ptb_fn||'',ptb_ln:p.ptb_ln||'',ptb_dp:p.ptb_dp||'',ptb_loc:p.ptb_loc||'',ptb_em:p.ptb_em||'',ptb_done:p.ptb_done||''};if(passed!==undefined){o.ptb_result=T;o.ptb_passed=passed?'true':'false';}window.location.href=PU+'?'+bP(o);}
+if(fr){var btnStyle='display:inline-block;padding:11px 28px;border:none;border-radius:8px;font-size:.95em;font-weight:600;cursor:pointer;background:#1a56a8;color:#fff;margin-top:12px;text-align:center;width:100%';
+setInterval(function(){
+var rB=document.getElementById('rB');
+var cs=document.getElementById('CS');
+if(rB&&rB.innerHTML.length>10&&!document.getElementById('ptbBackR')){
+var passed=typeof sc!=='undefined'&&sc>=8;
+var d=document.createElement('div');d.style.marginTop='12px';d.id='ptbBackR';
+d.innerHTML='<button onclick="('+goBack.toString()+')('+passed+')" style="'+btnStyle+'">&#x2190; Zurueck zum Trainingsportal</button>';
+rB.appendChild(d);
+}
+if(cs&&cs.offsetHeight>0&&!document.getElementById('ptbBackC')){
+var passed2=typeof sc!=='undefined'&&sc>=8;
+var d2=document.createElement('div');d2.style.marginTop='12px';d2.id='ptbBackC';d2.style.textAlign='center';
+d2.innerHTML='<button onclick="('+goBack.toString()+')('+passed2+')" style="'+btnStyle+'">&#x2190; Zurueck zum Trainingsportal</button>';
+var btns=cs.querySelectorAll('.br');if(btns.length>0)btns[btns.length-1].appendChild(d2);else cs.appendChild(d2);
+}
+},500);}
+})();
 </script></body></html>
 
