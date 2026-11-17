@@ -8,11 +8,13 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a202c}
-.hd{background:linear-gradient(135deg,#1a365d,#2563eb);color:#fff;padding:20px 30px;display:flex;align-items:center;justify-content:space-between}
+.hd{background:linear-gradient(135deg,#1a365d,#2563eb);color:#fff;padding:20px 30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .hd h1{font-size:1.3em;font-weight:600}
 .hd .sub{font-size:.85em;opacity:.8;margin-top:2px}
 .hd .lo{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.85em}
 .hd .lo:hover{background:rgba(255,255,255,.25)}
+.hd .lo.mail{background:rgba(255,180,0,.3);border-color:rgba(255,180,0,.5)}
+.hd .lo.mail:hover{background:rgba(255,180,0,.45)}
 .wrap{max-width:1200px;margin:0 auto;padding:20px}
 .login{max-width:400px;margin:80px auto;background:#fff;border-radius:12px;padding:40px;box-shadow:0 2px 12px rgba(0,0,0,.08);text-align:center}
 .login h2{margin-bottom:8px;color:#1a365d}
@@ -28,33 +30,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .card .lbl{font-size:.85em;color:#718096;margin-top:4px}
 .card.green .num{color:#2d8a4e}
 .card.orange .num{color:#c05621}
-.card.red .num{color:#c53030}
 .filters{background:#fff;border-radius:10px;padding:16px 20px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .filters label{font-size:.85em;color:#4a5568;font-weight:600}
 .filters select,.filters input{padding:8px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:.9em}
 .filters select{min-width:160px}
-.btn{padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.85em;font-weight:600}
-.btn:hover{background:#1d4ed8}
-.btn.sec{background:#718096}
-.btn.sec:hover{background:#4a5568}
-.btn.grn{background:#2d8a4e}
-.btn.grn:hover{background:#236b3e}
 table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06)}
 th{background:#f7fafc;padding:12px 16px;text-align:left;font-size:.8em;text-transform:uppercase;color:#4a5568;border-bottom:2px solid #e2e8f0}
 td{padding:10px 16px;border-bottom:1px solid #f0f0f0;font-size:.9em}
 tr:hover td{background:#f7fafc}
 .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.8em;font-weight:600}
 .badge.ok{background:#c6f6d5;color:#22543d}
-.badge.no{background:#fed7d7;color:#742a2a}
-.badge.wait{background:#fefcbf;color:#744210}
 .empty{text-align:center;padding:40px;color:#a0aec0;font-size:1.1em}
 .loading{text-align:center;padding:40px;color:#718096}
 .progress-bar{width:100%;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden}
 .progress-fill{height:100%;border-radius:4px;transition:width .3s}
 .mt{margin-top:20px}
 .mb{margin-bottom:20px}
-.fr{float:right}
-.gap8{gap:8px;display:flex}
+.mail-btn{display:inline-block;padding:4px 12px;background:#2563eb;color:#fff;text-decoration:none;border-radius:5px;font-size:.78em;font-weight:600;margin-left:8px}
+.mail-btn:hover{background:#1d4ed8}
 @media(max-width:768px){.filters{flex-direction:column}.cards{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -76,8 +69,9 @@ tr:hover td{background:#f7fafc}
 <h1>&#x1F4CA; ProTecBird Admin-Dashboard</h1>
 <div class="sub">Trainings-Uebersicht fuer alle Mitarbeitenden</div>
 </div>
-<div class="gap8">
+<div style="display:flex;gap:8px;flex-wrap:wrap">
 <button class="lo" onclick="loadData()">&#x1F504; Aktualisieren</button>
+<button class="lo mail" onclick="sendeErinnerungen()">&#x2709; Erinnerungen senden</button>
 <button class="lo" onclick="exportCSV()">&#x1F4E5; CSV Export</button>
 <button class="lo" onclick="doLogout()">Abmelden</button>
 </div>
@@ -85,7 +79,6 @@ tr:hover td{background:#f7fafc}
 
 <div class="wrap">
 <div class="cards" id="statCards"></div>
-
 <div class="filters">
 <label>Filter:</label>
 <select id="fTraining" onchange="renderTable()"><option value="">Alle Trainings</option></select>
@@ -93,9 +86,7 @@ tr:hover td{background:#f7fafc}
 <select id="fAbt" onchange="renderTable()"><option value="">Alle Abteilungen</option></select>
 <input type="text" id="fName" placeholder="Name suchen..." oninput="renderTable()">
 </div>
-
 <div id="tableWrap"></div>
-
 <div class="mt mb" style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 1px 6px rgba(0,0,0,.06)">
 <h3 style="margin-bottom:12px">&#x1F4CA; Fortschritt nach Mitarbeitenden</h3>
 <div id="progressView"></div>
@@ -105,171 +96,162 @@ tr:hover td{background:#f7fafc}
 
 <script>
 var API='https://script.google.com/macros/s/AKfycbzAuwGyzfJfvI6422aIQV6GU_5vHymUN985ALbJPM5MGdkGFh0IhkwiASt8684CTE7LFg/exec';
-var PW='',rawData=[],TRAININGS=['Cyber-Hygiene-Check-Up','Arbeitsschutz (Buero)','Arbeitsschutz (Fertigung)','DSGVO','Qualitaetsmanagement ISO 9001'];
+var PW='',rawData=[];
+var PORTAL='https://mw1003.github.io/protecbird-trainings/portal.html';
 
 function doLogin(){
 PW=document.getElementById('pwInput').value;
 document.getElementById('loginErr').style.display='none';
 loadData();
 }
-
 function doLogout(){
 PW='';rawData=[];
 document.getElementById('dashView').style.display='none';
 document.getElementById('loginView').style.display='block';
 document.getElementById('pwInput').value='';
 }
-
 function loadData(){
 document.getElementById('tableWrap').innerHTML='<div class="loading">&#x23F3; Daten werden geladen...</div>';
 fetch(API+'?pw='+encodeURIComponent(PW))
 .then(function(r){return r.json();})
 .then(function(d){
-if(d.status==='denied'){
-document.getElementById('loginErr').style.display='block';
-return;
-}
+if(d.status==='denied'){document.getElementById('loginErr').style.display='block';return;}
 document.getElementById('loginView').style.display='none';
 document.getElementById('dashView').style.display='block';
 rawData=d.data||[];
-buildFilters();
-renderCards();
-renderTable();
-renderProgress();
-})
-.catch(function(e){
-document.getElementById('tableWrap').innerHTML='<div class="empty">Fehler beim Laden: '+e.message+'</div>';
+buildFilters();renderCards();renderTable();renderProgress();
+}).catch(function(e){
+document.getElementById('tableWrap').innerHTML='<div class="empty">Fehler: '+e.message+'</div>';
 });
+}
+
+function getNeeded(ort){
+if(ort&&ort.toLowerCase()==='oyten')return['Cyber-Hygiene-Check-Up','Arbeitsschutz (Fertigung)','DSGVO','Qualitaetsmanagement ISO 9001'];
+return['Cyber-Hygiene-Check-Up','Arbeitsschutz (Buero)','DSGVO','Qualitaetsmanagement ISO 9001'];
+}
+
+function getMitarbeiter(){
+var users={};
+for(var i=0;i<rawData.length;i++){
+var r=rawData[i],key=((r.Vorname||'')+'|'+(r.Nachname||'')).toLowerCase();
+if(!users[key])users[key]={fn:r.Vorname||'',ln:r.Nachname||'',em:r.Email||'',abt:r.Abteilung||'',ort:r.Arbeitsort||'',done:{}};
+if(r.Training)users[key].done[r.Training]=true;
+if(r.Email&&!users[key].em)users[key].em=r.Email;
+}
+return users;
 }
 
 function buildFilters(){
 var ts=new Set(),os=new Set(),as=new Set();
-for(var i=0;i<rawData.length;i++){
-var r=rawData[i];
-if(r.Training)ts.add(r.Training);
-if(r.Arbeitsort)os.add(r.Arbeitsort);
-if(r.Abteilung)as.add(r.Abteilung);
+for(var i=0;i<rawData.length;i++){var r=rawData[i];if(r.Training)ts.add(r.Training);if(r.Arbeitsort)os.add(r.Arbeitsort);if(r.Abteilung)as.add(r.Abteilung);}
+fillSel('fTraining',ts,'Alle Trainings');fillSel('fOrt',os,'Alle Standorte');fillSel('fAbt',as,'Alle Abteilungen');
 }
-fillSelect('fTraining',ts,'Alle Trainings');
-fillSelect('fOrt',os,'Alle Standorte');
-fillSelect('fAbt',as,'Alle Abteilungen');
-}
-
-function fillSelect(id,items,def){
-var sel=document.getElementById(id),val=sel.value;
-sel.innerHTML='<option value="">'+def+'</option>';
-var arr=Array.from(items).sort();
-for(var i=0;i<arr.length;i++){
-var o=document.createElement('option');o.value=arr[i];o.textContent=arr[i];
-sel.appendChild(o);
-}
-sel.value=val;
+function fillSel(id,items,def){
+var s=document.getElementById(id),v=s.value;s.innerHTML='<option value="">'+def+'</option>';
+var a=Array.from(items).sort();for(var i=0;i<a.length;i++){var o=document.createElement('option');o.value=a[i];o.textContent=a[i];s.appendChild(o);}s.value=v;
 }
 
 function getFiltered(){
-var ft=document.getElementById('fTraining').value;
-var fo=document.getElementById('fOrt').value;
-var fa=document.getElementById('fAbt').value;
-var fn=document.getElementById('fName').value.toLowerCase();
+var ft=document.getElementById('fTraining').value,fo=document.getElementById('fOrt').value,fa=document.getElementById('fAbt').value,fn=document.getElementById('fName').value.toLowerCase();
 var out=[];
-for(var i=0;i<rawData.length;i++){
-var r=rawData[i];
-if(ft&&r.Training!==ft)continue;
-if(fo&&r.Arbeitsort!==fo)continue;
-if(fa&&r.Abteilung!==fa)continue;
-if(fn){var name=((r.Vorname||'')+' '+(r.Nachname||'')).toLowerCase();if(name.indexOf(fn)<0)continue;}
-out.push(r);
-}
-return out;
+for(var i=0;i<rawData.length;i++){var r=rawData[i];
+if(ft&&r.Training!==ft)continue;if(fo&&r.Arbeitsort!==fo)continue;if(fa&&r.Abteilung!==fa)continue;
+if(fn){var nm=((r.Vorname||'')+' '+(r.Nachname||'')).toLowerCase();if(nm.indexOf(fn)<0)continue;}
+out.push(r);}return out;
 }
 
 function renderCards(){
-var total=rawData.length;
-var users={};
-for(var i=0;i<rawData.length;i++){
-var r=rawData[i],key=(r.Vorname||'')+'|'+(r.Nachname||'')+'|'+(r.Abteilung||'');
-if(!users[key])users[key]={trainings:new Set(),ort:r.Arbeitsort||''};
-users[key].trainings.add(r.Training);
-}
-var uKeys=Object.keys(users),complete=0;
-for(var i=0;i<uKeys.length;i++){
-var u=users[uKeys[i]],needed=getNeededTrainings(u.ort);
-var done=0;for(var j=0;j<needed.length;j++){if(u.trainings.has(needed[j]))done++;}
-if(done>=needed.length)complete++;
-}
+var users=getMitarbeiter(),uKeys=Object.keys(users),complete=0,openCount=0;
+for(var i=0;i<uKeys.length;i++){var u=users[uKeys[i]],needed=getNeeded(u.ort),cnt=0;
+for(var j=0;j<needed.length;j++){if(u.done[needed[j]])cnt++;}
+if(cnt>=needed.length)complete++;else openCount++;}
 var h='';
-h+='<div class="card"><div class="num">'+total+'</div><div class="lbl">Eintraege gesamt</div></div>';
+h+='<div class="card"><div class="num">'+rawData.length+'</div><div class="lbl">Eintraege gesamt</div></div>';
 h+='<div class="card"><div class="num">'+uKeys.length+'</div><div class="lbl">Mitarbeitende</div></div>';
 h+='<div class="card green"><div class="num">'+complete+'</div><div class="lbl">Alle Trainings komplett</div></div>';
-h+='<div class="card orange"><div class="num">'+(uKeys.length-complete)+'</div><div class="lbl">Trainings offen</div></div>';
+h+='<div class="card orange"><div class="num">'+openCount+'</div><div class="lbl">Trainings offen</div></div>';
 document.getElementById('statCards').innerHTML=h;
-}
-
-function getNeededTrainings(ort){
-if(ort==='Oyten')return['Cyber-Hygiene-Check-Up','Arbeitsschutz (Fertigung)','DSGVO','Qualitaetsmanagement ISO 9001'];
-return['Cyber-Hygiene-Check-Up','Arbeitsschutz (Buero)','DSGVO','Qualitaetsmanagement ISO 9001'];
 }
 
 function renderTable(){
 var data=getFiltered();
 if(data.length===0){document.getElementById('tableWrap').innerHTML='<div class="empty">Keine Eintraege gefunden</div>';return;}
 var h='<table><tr><th>Vorname</th><th>Nachname</th><th>Abteilung</th><th>Arbeitsort</th><th>Training</th><th>Ergebnis</th><th>Datum</th></tr>';
-for(var i=0;i<data.length;i++){
-var r=data[i];
-h+='<tr>';
-h+='<td>'+(r.Vorname||'-')+'</td>';
-h+='<td>'+(r.Nachname||'-')+'</td>';
-h+='<td>'+(r.Abteilung||'-')+'</td>';
-h+='<td>'+(r.Arbeitsort||'-')+'</td>';
-h+='<td>'+(r.Training||'-')+'</td>';
-h+='<td><span class="badge ok">'+(r.Ergebnis||'-')+'</span></td>';
-h+='<td>'+(r.Datum||'-')+'</td>';
-h+='</tr>';
-}
-h+='</table>';
-document.getElementById('tableWrap').innerHTML=h;
+for(var i=0;i<data.length;i++){var r=data[i];
+h+='<tr><td>'+(r.Vorname||'-')+'</td><td>'+(r.Nachname||'-')+'</td><td>'+(r.Abteilung||'-')+'</td><td>'+(r.Arbeitsort||'-')+'</td><td>'+(r.Training||'-')+'</td><td><span class="badge ok">'+(r.Ergebnis||'-')+'</span></td><td>'+(r.Datum||'-')+'</td></tr>';}
+h+='</table>';document.getElementById('tableWrap').innerHTML=h;
 }
 
 function renderProgress(){
-var users={};
-for(var i=0;i<rawData.length;i++){
-var r=rawData[i],key=(r.Vorname||'')+'|'+(r.Nachname||'')+'|'+(r.Abteilung||'');
-if(!users[key])users[key]={fn:r.Vorname||'',ln:r.Nachname||'',abt:r.Abteilung||'',ort:r.Arbeitsort||'',trainings:new Set()};
-users[key].trainings.add(r.Training);
-}
-var uKeys=Object.keys(users).sort();
+var users=getMitarbeiter(),uKeys=Object.keys(users).sort();
 if(uKeys.length===0){document.getElementById('progressView').innerHTML='<div class="empty">Noch keine Daten</div>';return;}
 var h='';
 for(var i=0;i<uKeys.length;i++){
-var u=users[uKeys[i]],needed=getNeededTrainings(u.ort);
-var done=0;for(var j=0;j<needed.length;j++){if(u.trainings.has(needed[j]))done++;}
+var u=users[uKeys[i]],needed=getNeeded(u.ort),done=0,offen=[];
+for(var j=0;j<needed.length;j++){if(u.done[needed[j]])done++;else offen.push(needed[j]);}
 var pct=Math.round(done/needed.length*100);
 var col=pct===100?'#2d8a4e':pct>=50?'#c05621':'#c53030';
 h+='<div style="margin-bottom:12px;padding:10px 0;border-bottom:1px solid #f0f0f0">';
-h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
-h+='<strong>'+u.fn+' '+u.ln+'</strong>';
+h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap">';
+h+='<span><strong>'+u.fn+' '+u.ln+'</strong>';
+if(u.em&&offen.length>0){h+='<a class="mail-btn" href="'+buildMailto(u,offen)+'" title="Erinnerung senden">&#x2709; Mail</a>';}
+h+='</span>';
 h+='<span style="font-size:.85em;color:#718096">'+u.abt+' | '+u.ort+' | '+done+'/'+needed.length+'</span>';
 h+='</div>';
 h+='<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%;background:'+col+'"></div></div>';
 h+='<div style="font-size:.8em;color:#a0aec0;margin-top:4px">';
-for(var j=0;j<needed.length;j++){
-var isDone=u.trainings.has(needed[j]);
-h+=(isDone?'&#x2705;':'&#x274C;')+' '+needed[j]+' &nbsp; ';
-}
+for(var j=0;j<needed.length;j++){var ok=u.done[needed[j]];h+=(ok?'&#x2705;':'&#x274C;')+' '+needed[j]+' &nbsp; ';}
 h+='</div></div>';
 }
 document.getElementById('progressView').innerHTML=h;
 }
 
+function buildMailto(u,offen){
+var jahr=new Date().getFullYear();
+var link=PORTAL+'?ptb_fn='+encodeURIComponent(u.fn)+'&ptb_ln='+encodeURIComponent(u.ln)+'&ptb_dp='+encodeURIComponent(u.abt)+'&ptb_loc='+encodeURIComponent(u.ort)+'&ptb_em='+encodeURIComponent(u.em);
+var subj='Erinnerung: '+offen.length+' offene Unterweisung(en) - bitte bis November abschliessen';
+var body='Hallo '+u.fn+',\r\n\r\nfuer das Jahr '+jahr+' stehen noch folgende Unterweisungen aus:\r\n\r\n';
+for(var k=0;k<offen.length;k++){body+='  - '+offen[k]+'\r\n';}
+body+='\r\nBitte schliessen Sie alle Trainings bis Ende November '+jahr+' ab.\r\n\r\nZum Trainingsportal:\r\n'+link+'\r\n\r\nMit freundlichen Gruessen\r\nProTecBird GmbH\r\nArbeitssicherheit & Compliance';
+return 'mailto:'+encodeURIComponent(u.em)+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+}
+
+function sendeErinnerungen(){
+var users=getMitarbeiter(),uKeys=Object.keys(users),offenList=[],ohneEmail=[];
+for(var i=0;i<uKeys.length;i++){
+var u=users[uKeys[i]],needed=getNeeded(u.ort),offen=[];
+for(var j=0;j<needed.length;j++){if(!u.done[needed[j]])offen.push(needed[j]);}
+if(offen.length===0)continue;
+if(!u.em){ohneEmail.push(u.fn+' '+u.ln);continue;}
+offenList.push({u:u,offen:offen});
+}
+if(offenList.length===0&&ohneEmail.length===0){alert('Alle Mitarbeitenden haben ihre Trainings abgeschlossen! Keine Erinnerungen noetig.');return;}
+if(offenList.length===0){alert('Mitarbeitende mit offenen Trainings aber ohne E-Mail:\n\n'+ohneEmail.join('\n')+'\n\nBitte informieren Sie diese manuell.');return;}
+
+var jahr=new Date().getFullYear();
+var emails=[],names=[];
+for(var i=0;i<offenList.length;i++){emails.push(offenList[i].u.em);names.push(offenList[i].u.fn+' '+offenList[i].u.ln+' ('+offenList[i].offen.length+' offen)');}
+
+var subj='Erinnerung: Offene Unterweisungen '+jahr+' - bitte bis November abschliessen';
+var body='Liebe Kolleginnen und Kollegen,\r\n\r\nfuer das Jahr '+jahr+' stehen bei Ihnen noch Unterweisungen aus.\r\n\r\nBitte schliessen Sie alle offenen Trainings bis Ende November '+jahr+' ueber unser Trainingsportal ab:\r\n\r\n'+PORTAL+'\r\n\r\nBei Fragen wenden Sie sich bitte an Ihre Abteilungsleitung.\r\n\r\nMit freundlichen Gruessen\r\nProTecBird GmbH\r\nArbeitssicherheit & Compliance';
+
+var info='Erinnerung wird vorbereitet fuer '+offenList.length+' Mitarbeitende:\n\n'+names.join('\n');
+if(ohneEmail.length>0){info+='\n\nOhne E-Mail (bitte manuell informieren):\n'+ohneEmail.join('\n');}
+info+='\n\nOutlook oeffnet sich jetzt mit der vorbereiteten Mail.';
+alert(info);
+
+window.location.href='mailto:'+emails.join(',')+
+'?subject='+encodeURIComponent(subj)+
+'&body='+encodeURIComponent(body);
+}
+
 function exportCSV(){
 if(rawData.length===0){alert('Keine Daten zum Exportieren');return;}
 var csv='Vorname;Nachname;Email;Abteilung;Arbeitsort;Training;Ergebnis;Datum\n';
-for(var i=0;i<rawData.length;i++){
-var r=rawData[i];
-csv+=(r.Vorname||'')+';'+(r.Nachname||'')+';'+(r.Email||'')+';'+(r.Abteilung||'')+';'+(r.Arbeitsort||'')+';'+(r.Training||'')+';'+(r.Ergebnis||'')+';'+(r.Datum||'')+'\n';
-}
+for(var i=0;i<rawData.length;i++){var r=rawData[i];
+csv+=(r.Vorname||'')+';'+(r.Nachname||'')+';'+(r.Email||'')+';'+(r.Abteilung||'')+';'+(r.Arbeitsort||'')+';'+(r.Training||'')+';'+(r.Ergebnis||'')+';'+(r.Datum||'')+'\n';}
 var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
-var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ProTecBird_Trainings_Export_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ProTecBird_Trainings_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 </script>
 </body>
