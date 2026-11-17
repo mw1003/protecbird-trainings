@@ -7,61 +7,80 @@
 <title>ProTecBird Trainingsportal</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;min-height:100vh}
-.hd{background:linear-gradient(135deg,#1a365d,#2563eb);color:#fff;padding:24px;text-align:center}
-.hd h1{font-size:1.6em;margin-bottom:4px}
-.hd p{opacity:.85;font-size:.95em}
-.wrap{max-width:700px;margin:0 auto;padding:20px}
-.card{background:#fff;border-radius:12px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-bottom:20px}
-.card h2{font-size:1.15em;color:#1a365d;margin-bottom:16px}
-label{display:block;font-size:.85em;color:#4a5568;font-weight:600;margin-bottom:4px;margin-top:12px}
-input,select{width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:.95em}
-input:focus,select:focus{outline:none;border-color:#2563eb}
-.btn{display:block;width:100%;padding:13px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:1em;font-weight:600;cursor:pointer;margin-top:20px}
-.btn:hover{background:#1d4ed8}
-.btn:disabled{background:#a0aec0;cursor:not-allowed}
-.prog{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-bottom:20px}
-.prog h3{font-size:1em;color:#1a365d;margin-bottom:10px}
-.pbar{width:100%;height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden;margin-bottom:6px}
-.pfill{height:100%;border-radius:5px;transition:width .5s}
-.ptext{font-size:.8em;color:#718096;text-align:right}
-.tlist{list-style:none}
-.tlist li{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-radius:10px;margin-bottom:10px;background:#f7fafc;border:2px solid #e2e8f0;cursor:pointer;transition:all .2s}
-.tlist li:hover{border-color:#2563eb;box-shadow:0 2px 8px rgba(37,99,235,.12)}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f0f2f5;min-height:100vh}
+.header{background:linear-gradient(135deg,#1a365d 0%,#2563eb 100%);color:#fff;text-align:center;padding:32px 20px 28px}
+.header h1{font-size:1.7em;font-weight:700;margin-bottom:4px;letter-spacing:.5px}
+.header p{font-size:.95em;opacity:.85;margin-top:2px}
+.header .icon{font-size:2.2em;margin-bottom:8px}
+.container{max-width:680px;margin:0 auto;padding:24px 16px}
+.card{background:#fff;border-radius:14px;padding:32px;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-bottom:22px}
+.card h2{color:#1a365d;font-size:1.15em;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:.82em;font-weight:600;color:#4a5568;margin-bottom:4px}
+.field label span{color:#c53030}
+.field input,.field select{width:100%;padding:11px 14px;border:2px solid #e2e8f0;border-radius:8px;font-size:.95em;transition:border-color .2s}
+.field input:focus,.field select:focus{outline:none;border-color:#2563eb}
+.btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:10px;font-size:1.05em;font-weight:600;cursor:pointer;margin-top:20px;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,99,235,.35)}
+.btn:disabled{background:#a0aec0;transform:none;box-shadow:none;cursor:wait}
+.welcome{font-size:1.05em;color:#2d3748;margin-bottom:20px;line-height:1.5}
+.progress-box{background:#fff;border-radius:14px;padding:22px 24px;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-bottom:22px}
+.progress-box h3{font-size:.95em;color:#1a365d;margin-bottom:10px;font-weight:600}
+.pbar{width:100%;height:12px;background:#e2e8f0;border-radius:6px;overflow:hidden}
+.pfill{height:100%;border-radius:6px;transition:width .6s ease}
+.ptext{font-size:.82em;color:#718096;margin-top:6px;text-align:right}
+.tlist{list-style:none;padding:0}
+.tlist li{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-radius:12px;margin-bottom:10px;background:#f7fafc;border:2px solid #e2e8f0;cursor:pointer;transition:all .2s}
+.tlist li:hover{border-color:#2563eb;background:#eef3fb;box-shadow:0 2px 10px rgba(37,99,235,.1)}
 .tlist li.done{border-color:#c6f6d5;background:#f0fff4}
-.tlist li.done:hover{border-color:#2d8a4e}
-.tname{font-weight:600;color:#1a365d;font-size:.95em}
-.tstatus{font-size:.8em;font-weight:600;padding:4px 12px;border-radius:12px}
-.tstatus.ok{background:#c6f6d5;color:#22543d}
-.tstatus.no{background:#fed7d7;color:#742a2a}
-.hi{font-size:1.05em;color:#2d3748;margin-bottom:16px}
-.lo{display:inline-block;margin-top:16px;padding:8px 16px;background:#e2e8f0;color:#4a5568;border:none;border-radius:6px;cursor:pointer;font-size:.85em}
-.lo:hover{background:#cbd5e0}
-.loading-msg{text-align:center;padding:20px;color:#718096;font-size:.95em}
+.tlist li.done:hover{border-color:#2d8a4e;background:#e6ffed}
+.tname{font-weight:600;color:#1a365d;font-size:.95em;display:flex;align-items:center;gap:8px}
+.tbadge{font-size:.78em;font-weight:700;padding:5px 14px;border-radius:14px}
+.tbadge.ok{background:#c6f6d5;color:#22543d}
+.tbadge.no{background:#fed7d7;color:#742a2a}
+.logout{display:inline-block;margin-top:18px;padding:9px 20px;background:#e2e8f0;color:#4a5568;border:none;border-radius:8px;cursor:pointer;font-size:.85em;font-weight:600;transition:background .2s}
+.logout:hover{background:#cbd5e0}
+.loading{text-align:center;padding:30px;color:#718096;font-size:.95em}
 </style>
 </head>
 <body>
-<div class="hd">
-<h1>&#x1F393; PROTECBIRD Trainingsportal</h1>
+
+<div class="header">
+<div class="icon">&#x1F393;</div>
+<h1>PROTECBIRD</h1>
+<h1 style="font-size:1.1em;font-weight:400;margin-top:2px">Trainingsportal</h1>
 <p>Jaehrliche Unterweisungen &amp; Schulungen</p>
 </div>
-<div class="wrap" id="app"></div>
+
+<div class="container" id="app"></div>
 
 <script>
 var API='https://script.google.com/macros/s/AKfycbzAuwGyzfJfvI6422aIQV6GU_5vHymUN985ALbJPM5MGdkGFh0IhkwiASt8684CTE7LFg/exec';
 var GH='https://mw1003.github.io/protecbird-trainings/';
+
 var TRAININGS_BUERO=[
 {id:'cyber',name:'Cyber-Hygiene-Check-Up',file:'Cyber-Hygiene-Check-Up V3.0.html'},
-{id:'buero',name:'Arbeitsschutz (Buero)',file:'Arbeitsschutz (Buero).html'},
+{id:'buero',name:'Arbeitsschutz (B\u00fcro)',file:'Arbeitsschutz (B\u00fcro).html'},
 {id:'dsgvo',name:'DSGVO',file:'DSGVO.html'},
-{id:'iso9001',name:'Qualitaetsmanagement ISO 9001',file:'Qualitaetsmanagement - ISO9001.html'}
+{id:'iso9001',name:'Qualit\u00e4tsmanagement ISO 9001',file:'Qualit\u00e4tsmanagement - ISO9001.html'}
 ];
 var TRAININGS_FERTIGUNG=[
 {id:'cyber',name:'Cyber-Hygiene-Check-Up',file:'Cyber-Hygiene-Check-Up V3.0.html'},
 {id:'fertigung',name:'Arbeitsschutz (Fertigung)',file:'Arbeitsschutz (Fertigung).html'},
 {id:'dsgvo',name:'DSGVO',file:'DSGVO.html'},
-{id:'iso9001',name:'Qualitaetsmanagement ISO 9001',file:'Qualitaetsmanagement - ISO9001.html'}
+{id:'iso9001',name:'Qualit\u00e4tsmanagement ISO 9001',file:'Qualit\u00e4tsmanagement - ISO9001.html'}
 ];
+
+/* Training-Name zu ID Mapping fuer Google Sheets */
+var TMAP={
+'Cyber-Hygiene-Check-Up':'cyber',
+'Arbeitsschutz (Buero)':'buero',
+'Arbeitsschutz (B\u00fcro)':'buero',
+'Arbeitsschutz (Fertigung)':'fertigung',
+'DSGVO':'dsgvo',
+'Qualitaetsmanagement ISO 9001':'iso9001',
+'Qualit\u00e4tsmanagement ISO 9001':'iso9001'
+};
 
 var user=null,completedIds={},trainings=[];
 
@@ -70,12 +89,22 @@ var p=getParams();
 if(p.ptb_fn&&p.ptb_ln&&p.ptb_dp&&p.ptb_loc){
 user={fn:p.ptb_fn,ln:p.ptb_ln,dp:p.ptb_dp,loc:p.ptb_loc,em:p.ptb_em||''};
 trainings=user.loc.toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
-if(p.ptb_result&&p.ptb_passed==='true'){completedIds[p.ptb_result]=true;}
+/* URL-Parameter auswerten */
 if(p.ptb_done){var d=p.ptb_done.split(',');for(var i=0;i<d.length;i++){if(d[i])completedIds[d[i]]=true;}}
+if(p.ptb_result&&p.ptb_passed==='true'){completedIds[p.ptb_result]=true;}
+saveResults();
+/* Status aus Google Sheets laden */
 fetchStatus();
 return;
 }
+/* Lokalen Speicher pruefen */
+loadResults();
+if(user){
+trainings=user.loc.toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
+fetchStatus();
+}else{
 showLogin();
+}
 }
 
 function getParams(){
@@ -85,32 +114,33 @@ var a=s.split('&');for(var i=0;i<a.length;i++){var kv=a[i].split('=');if(kv.leng
 
 function fetchStatus(){
 var app=document.getElementById('app');
-app.innerHTML='<div class="loading-msg">&#x23F3; Trainingsstatus wird geladen...</div>';
+app.innerHTML='<div class="loading">&#x23F3; Trainingsstatus wird geladen...</div>';
 fetch(API+'?mode=check&fn='+encodeURIComponent(user.fn)+'&ln='+encodeURIComponent(user.ln))
 .then(function(r){return r.json();})
 .then(function(d){
 if(d.status==='ok'&&d.trainings){
 for(var i=0;i<d.trainings.length;i++){
-var t=d.trainings[i];
-for(var j=0;j<trainings.length;j++){
-if(trainings[j].name===t){completedIds[trainings[j].id]=true;}
+var tid=TMAP[d.trainings[i]];
+if(tid)completedIds[tid]=true;
 }
 }
-}
-saveLocal();showDash();
+saveResults();
+showDash();
 })
 .catch(function(){
-loadLocal();showDash();
+showDash();
 });
 }
 
 function showLogin(){
-var h='<div class="card"><h2>&#x1F464; Anmeldung</h2>';
-h+='<label>Vorname *</label><input id="fn" placeholder="Max">';
-h+='<label>Nachname *</label><input id="ln" placeholder="Mustermann">';
-h+='<label>Abteilung *</label><input id="dp" placeholder="z.B. Produktion">';
-h+='<label>Arbeitsort *</label><select id="loc"><option value="">-- Bitte waehlen --</option><option value="Achim">Achim</option><option value="Oyten">Oyten</option><option value="Remote">Remote</option></select>';
-h+='<label>E-Mail</label><input id="em" type="email" placeholder="max@protecbird.de">';
+var h='<div class="card">';
+h+='<h2>&#x1F464; Anmeldung</h2>';
+h+='<div class="field"><label>Vorname <span>*</span></label><input id="fn" placeholder="Max"></div>';
+h+='<div class="field"><label>Nachname <span>*</span></label><input id="ln" placeholder="Mustermann"></div>';
+h+='<div class="field"><label>Abteilung <span>*</span></label><input id="dp" placeholder="z.B. Produktion"></div>';
+h+='<div class="field"><label>Arbeitsort <span>*</span></label>';
+h+='<select id="loc"><option value="">-- Bitte waehlen --</option><option value="Achim">Achim</option><option value="Oyten">Oyten</option><option value="Remote">Remote</option></select></div>';
+h+='<div class="field"><label>E-Mail</label><input id="em" type="email" placeholder="max@protecbird.de"></div>';
 h+='<button class="btn" onclick="doLogin()">Anmelden &amp; Trainings anzeigen &#x2192;</button>';
 h+='</div>';
 document.getElementById('app').innerHTML=h;
@@ -122,63 +152,81 @@ var ln=document.getElementById('ln').value.trim();
 var dp=document.getElementById('dp').value.trim();
 var loc=document.getElementById('loc').value;
 var em=document.getElementById('em').value.trim();
-if(!fn||!ln||!dp||!loc){alert('Bitte alle Pflichtfelder ausfuellen');return;}
+if(!fn||!ln||!dp||!loc){alert('Bitte alle Pflichtfelder (*) ausfuellen.');return;}
 user={fn:fn,ln:ln,dp:dp,loc:loc,em:em};
-trainings=loc.toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
 completedIds={};
+trainings=loc.toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
+saveResults();
 fetchStatus();
 }
 
 function showDash(){
-var done=0;for(var i=0;i<trainings.length;i++){if(completedIds[trainings[i].id])done++;}
+var done=0;
+for(var i=0;i<trainings.length;i++){if(completedIds[trainings[i].id])done++;}
 var pct=Math.round(done/trainings.length*100);
 var col=pct===100?'#2d8a4e':pct>=50?'#c05621':'#c53030';
 
-var h='<div class="hi">Hallo <strong>'+user.fn+'</strong>! ';
-if(pct===100)h+='&#x1F389; Alle Trainings abgeschlossen!';
-else h+=done+' von '+trainings.length+' Trainings abgeschlossen.';
+var h='<div class="welcome">Hallo <strong>'+user.fn+'</strong>! ';
+if(pct===100){h+='&#x1F389; Alle Trainings abgeschlossen!';}
+else{h+=done+' von '+trainings.length+' Trainings abgeschlossen.';}
 h+='</div>';
 
-h+='<div class="prog"><h3>Ihr Fortschritt</h3>';
+h+='<div class="progress-box"><h3>Ihr Fortschritt</h3>';
 h+='<div class="pbar"><div class="pfill" style="width:'+pct+'%;background:'+col+'"></div></div>';
 h+='<div class="ptext">'+done+'/'+trainings.length+' ('+pct+'%)</div></div>';
 
 h+='<div class="card"><h2>&#x1F4CB; Ihre Trainings</h2><ul class="tlist">';
 for(var i=0;i<trainings.length;i++){
 var t=trainings[i],isDone=!!completedIds[t.id];
-var cls=isDone?'done':'';
-h+='<li class="'+cls+'" onclick="startQuiz(\''+t.id+'\')">';
+h+='<li class="'+(isDone?'done':'')+'" onclick="startQuiz(\''+t.id+'\')">';
 h+='<span class="tname">'+(isDone?'&#x2705;':'&#x1F4D6;')+' '+t.name+'</span>';
-h+='<span class="tstatus '+(isDone?'ok':'no')+'">'+(isDone?'Bestanden':'Offen')+'</span>';
+h+='<span class="tbadge '+(isDone?'ok':'no')+'">'+(isDone?'Bestanden':'Offen')+'</span>';
 h+='</li>';
 }
 h+='</ul></div>';
-h+='<button class="lo" onclick="doLogout()">&#x1F6AA; Abmelden</button>';
+h+='<button class="logout" onclick="doLogout()">&#x1F6AA; Abmelden</button>';
+
 document.getElementById('app').innerHTML=h;
+/* URL bereinigen */
+window.history.replaceState({},'',window.location.pathname);
 }
 
 function startQuiz(id){
-var t=null;for(var i=0;i<trainings.length;i++){if(trainings[i].id===id)t=trainings[i];}
+var t=null;
+for(var i=0;i<trainings.length;i++){if(trainings[i].id===id)t=trainings[i];}
 if(!t)return;
-var doneList=[];for(var k in completedIds){if(completedIds[k])doneList.push(k);}
-var url=GH+encodeURI(t.file)+'?ptb_fn='+encodeURIComponent(user.fn)+'&ptb_ln='+encodeURIComponent(user.ln)+'&ptb_dp='+encodeURIComponent(user.dp)+'&ptb_loc='+encodeURIComponent(user.loc)+'&ptb_em='+encodeURIComponent(user.em)+'&ptb_done='+encodeURIComponent(doneList.join(','));
+var doneList=[];
+for(var k in completedIds){if(completedIds[k])doneList.push(k);}
+var url=GH+encodeURI(t.file)
++'?ptb_fn='+encodeURIComponent(user.fn)
++'&ptb_ln='+encodeURIComponent(user.ln)
++'&ptb_dp='+encodeURIComponent(user.dp)
++'&ptb_loc='+encodeURIComponent(user.loc)
++'&ptb_em='+encodeURIComponent(user.em)
++'&ptb_done='+encodeURIComponent(doneList.join(','));
 window.location.href=url;
 }
 
 function doLogout(){
 user=null;completedIds={};
+try{localStorage.removeItem('ptb_user');localStorage.removeItem('ptb_done');}catch(e){}
 window.history.replaceState({},'',window.location.pathname);
 showLogin();
 }
 
-function saveLocal(){
-try{localStorage.setItem('ptb_user',JSON.stringify(user));localStorage.setItem('ptb_done',JSON.stringify(completedIds));}catch(e){}
-}
-function loadLocal(){
+function saveResults(){
 try{
-var u=localStorage.getItem('ptb_user'),d=localStorage.getItem('ptb_done');
+localStorage.setItem('ptb_user',JSON.stringify(user));
+localStorage.setItem('ptb_done',JSON.stringify(completedIds));
+}catch(e){}
+}
+
+function loadResults(){
+try{
+var u=localStorage.getItem('ptb_user');
+var d=localStorage.getItem('ptb_done');
 if(u)user=JSON.parse(u);
-if(d){var obj=JSON.parse(d);for(var k in obj){completedIds[k]=obj[k];}}
+if(d){var obj=JSON.parse(d);for(var k in obj){if(obj[k])completedIds[k]=obj[k];}}
 }catch(e){}
 }
 
