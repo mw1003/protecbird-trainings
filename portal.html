@@ -44,93 +44,93 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f0f2f
 </style>
 </head>
 <body>
-
 <div class="header">
 <div class="icon">&#x1F393;</div>
 <h1>PROTECBIRD</h1>
 <h1 style="font-size:1.1em;font-weight:400;margin-top:2px">Trainingsportal</h1>
 <p>Jaehrliche Unterweisungen &amp; Schulungen</p>
 </div>
-
 <div class="container" id="app"></div>
-
 <script>
-var API='https://script.google.com/macros/s/AKfycbzAuwGyzfJfvI6422aIQV6GU_5vHymUN985ALbJPM5MGdkGFh0IhkwiASt8684CTE7LFg/exec';
-var GH='https://mw1003.github.io/protecbird-trainings/';
+var API="https://script.google.com/macros/s/AKfycbzAuwGyzfJfvI6422aIQV6GU_5vHymUN985ALbJPM5MGdkGFh0IhkwiASt8684CTE7LFg/exec";
+var GH="https://mw1003.github.io/protecbird-trainings/";
 
 var TRAININGS_BUERO=[
-{id:'cyber',name:'Cyber-Hygiene-Check-Up',file:'Cyber-Hygiene-Check-Up V3.0.html'},
-{id:'buero',name:'Arbeitsschutz (B\u00fcro)',file:'Arbeitsschutz (B\u00fcro).html'},
-{id:'dsgvo',name:'DSGVO',file:'DSGVO.html'},
-{id:'iso9001',name:'Qualit\u00e4tsmanagement ISO 9001',file:'Qualit\u00e4tsmanagement - ISO9001.html'}
+{id:"cyber",name:"Cyber-Hygiene-Check-Up",file:"Cyber-Hygiene-Check-Up V3.0.html"},
+{id:"buero",name:"Arbeitsschutz (B\u00fcro)",file:"Arbeitsschutz (B\u00fcro).html"},
+{id:"dsgvo",name:"DSGVO",file:"DSGVO.html"},
+{id:"iso9001",name:"Qualit\u00e4tsmanagement ISO 9001",file:"Qualit\u00e4tsmanagement - ISO9001.html"}
 ];
 var TRAININGS_FERTIGUNG=[
-{id:'cyber',name:'Cyber-Hygiene-Check-Up',file:'Cyber-Hygiene-Check-Up V3.0.html'},
-{id:'fertigung',name:'Arbeitsschutz (Fertigung)',file:'Arbeitsschutz (Fertigung).html'},
-{id:'dsgvo',name:'DSGVO',file:'DSGVO.html'},
-{id:'iso9001',name:'Qualit\u00e4tsmanagement ISO 9001',file:'Qualit\u00e4tsmanagement - ISO9001.html'}
+{id:"cyber",name:"Cyber-Hygiene-Check-Up",file:"Cyber-Hygiene-Check-Up V3.0.html"},
+{id:"fertigung",name:"Arbeitsschutz (Fertigung)",file:"Arbeitsschutz (Fertigung).html"},
+{id:"dsgvo",name:"DSGVO",file:"DSGVO.html"},
+{id:"iso9001",name:"Qualit\u00e4tsmanagement ISO 9001",file:"Qualit\u00e4tsmanagement - ISO9001.html"}
 ];
 
-/* Training-Name zu ID Mapping fuer Google Sheets */
 var TMAP={
-'Cyber-Hygiene-Check-Up':'cyber',
-'Arbeitsschutz (Buero)':'buero',
-'Arbeitsschutz (B\u00fcro)':'buero',
-'Arbeitsschutz (Fertigung)':'fertigung',
-'DSGVO':'dsgvo',
-'Qualitaetsmanagement ISO 9001':'iso9001',
-'Qualit\u00e4tsmanagement ISO 9001':'iso9001'
+"Cyber-Hygiene-Check-Up":"cyber",
+"Arbeitsschutz (Buero)":"buero",
+"Arbeitsschutz (B\u00fcro)":"buero",
+"Arbeitsschutz (Fertigung)":"fertigung",
+"DSGVO":"dsgvo",
+"Qualitaetsmanagement ISO 9001":"iso9001",
+"Qualit\u00e4tsmanagement ISO 9001":"iso9001"
 };
 
-var user=null,completedIds={},trainings=[];
+var user=null;
+var completedIds={};
+var trainings=[];
+
+function getTrainings(loc){
+if(loc&&loc.toLowerCase()==="oyten"){return TRAININGS_FERTIGUNG;}
+return TRAININGS_BUERO;
+}
+
+function getParams(){
+var p={};
+var s=window.location.search.substring(1);
+if(!s){return p;}
+var a=s.split("&");
+for(var i=0;i<a.length;i++){
+var kv=a[i].split("=");
+if(kv.length===2){p[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]);}
+}
+return p;
+}
 
 function init(){
 var p=getParams();
 if(p.ptb_fn&&p.ptb_ln&&p.ptb_dp&&p.ptb_loc){
-user={fn:p.ptb_fn,ln:p.ptb_ln,dp:p.ptb_dp,loc:p.ptb_loc,em:p.ptb_em||''};
-trainings=(user.loc||'').toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
-if(p.ptb_done){var d=p.ptb_done.split(',');for(var i=0;i<d.length;i++){if(d[i])completedIds[d[i]]=true;}}
-if(p.ptb_result&&p.ptb_passed==='true'){completedIds[p.ptb_result]=true;}
+user={fn:p.ptb_fn,ln:p.ptb_ln,dp:p.ptb_dp,loc:p.ptb_loc,em:p.ptb_em||""};
+trainings=getTrainings(user.loc);
+if(p.ptb_done){var d=p.ptb_done.split(",");for(var i=0;i<d.length;i++){if(d[i]){completedIds[d[i]]=true;}}}
+if(p.ptb_result&&p.ptb_passed==="true"){completedIds[p.ptb_result]=true;}
 saveResults();
 fetchStatus();
 return;
 }
 loadResults();
 if(user&&user.fn&&user.ln&&user.loc){
-trainings=(user.loc||'').toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
+trainings=getTrainings(user.loc);
 fetchStatus();
 }else{
-user=null;completedIds={};
-try{localStorage.removeItem('ptb_user');localStorage.removeItem('ptb_done');}catch(e){}
+user=null;
+completedIds={};
+try{localStorage.removeItem("ptb_user");localStorage.removeItem("ptb_done");}catch(e){}
 showLogin();
 }
-}
-
-/* Lokalen Speicher pruefen */
-loadResults();
-if(user){
-trainings=(user.loc||'').toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
-fetchStatus();
-}else{
-showLogin();
-}
-}
-
-function getParams(){
-var p={},s=window.location.search.substring(1);if(!s)return p;
-var a=s.split('&');for(var i=0;i<a.length;i++){var kv=a[i].split('=');if(kv.length===2)p[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]);}return p;
 }
 
 function fetchStatus(){
-var app=document.getElementById('app');
-app.innerHTML='<div class="loading">&#x23F3; Trainingsstatus wird geladen...</div>';
-fetch(API+'?mode=check&fn='+encodeURIComponent(user.fn)+'&ln='+encodeURIComponent(user.ln))
+document.getElementById("app").innerHTML='<div class="loading">&#x23F3; Trainingsstatus wird geladen...</div>';
+fetch(API+"?mode=check&fn="+encodeURIComponent(user.fn)+"&ln="+encodeURIComponent(user.ln))
 .then(function(r){return r.json();})
 .then(function(d){
-if(d.status==='ok'&&d.trainings){
+if(d.status==="ok"&&d.trainings){
 for(var i=0;i<d.trainings.length;i++){
 var tid=TMAP[d.trainings[i]];
-if(tid)completedIds[tid]=true;
+if(tid){completedIds[tid]=true;}
 }
 }
 saveResults();
@@ -152,91 +152,88 @@ h+='<select id="loc"><option value="">-- Bitte waehlen --</option><option value=
 h+='<div class="field"><label>E-Mail</label><input id="em" type="email" placeholder="max@protecbird.de"></div>';
 h+='<button class="btn" onclick="doLogin()">Anmelden &amp; Trainings anzeigen &#x2192;</button>';
 h+='</div>';
-document.getElementById('app').innerHTML=h;
+document.getElementById("app").innerHTML=h;
 }
 
 function doLogin(){
-var fn=document.getElementById('fn').value.trim();
-var ln=document.getElementById('ln').value.trim();
-var dp=document.getElementById('dp').value.trim();
-var loc=document.getElementById('loc').value;
-var em=document.getElementById('em').value.trim();
-if(!fn||!ln||!dp||!loc){alert('Bitte alle Pflichtfelder (*) ausfuellen.');return;}
+var fn=document.getElementById("fn").value.trim();
+var ln=document.getElementById("ln").value.trim();
+var dp=document.getElementById("dp").value.trim();
+var loc=document.getElementById("loc").value;
+var em=document.getElementById("em").value.trim();
+if(!fn||!ln||!dp||!loc){alert("Bitte alle Pflichtfelder (*) ausfuellen.");return;}
 user={fn:fn,ln:ln,dp:dp,loc:loc,em:em};
 completedIds={};
-trainings=loc.toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
+trainings=getTrainings(loc);
 saveResults();
 fetchStatus();
 }
 
 function showDash(){
 var done=0;
-for(var i=0;i<trainings.length;i++){if(completedIds[trainings[i].id])done++;}
+for(var i=0;i<trainings.length;i++){if(completedIds[trainings[i].id]){done++;}}
 var pct=Math.round(done/trainings.length*100);
-var col=pct===100?'#2d8a4e':pct>=50?'#c05621':'#c53030';
-
+var col=pct===100?"#2d8a4e":pct>=50?"#c05621":"#c53030";
 var h='<div class="welcome">Hallo <strong>'+user.fn+'</strong>! ';
 if(pct===100){h+='&#x1F389; Alle Trainings abgeschlossen!';}
 else{h+=done+' von '+trainings.length+' Trainings abgeschlossen.';}
 h+='</div>';
-
 h+='<div class="progress-box"><h3>Ihr Fortschritt</h3>';
 h+='<div class="pbar"><div class="pfill" style="width:'+pct+'%;background:'+col+'"></div></div>';
 h+='<div class="ptext">'+done+'/'+trainings.length+' ('+pct+'%)</div></div>';
-
 h+='<div class="card"><h2>&#x1F4CB; Ihre Trainings</h2><ul class="tlist">';
 for(var i=0;i<trainings.length;i++){
-var t=trainings[i],isDone=!!completedIds[t.id];
-h+='<li class="'+(isDone?'done':'')+'" onclick="startQuiz(\''+t.id+'\')">';
-h+='<span class="tname">'+(isDone?'&#x2705;':'&#x1F4D6;')+' '+t.name+'</span>';
-h+='<span class="tbadge '+(isDone?'ok':'no')+'">'+(isDone?'Bestanden':'Offen')+'</span>';
+var t=trainings[i];
+var isDone=!!completedIds[t.id];
+h+='<li class="'+(isDone?"done":"")+'" onclick="startQuiz(\''+t.id+'\')">';
+h+='<span class="tname">'+(isDone?"&#x2705;":"&#x1F4D6;")+" "+t.name+'</span>';
+h+='<span class="tbadge '+(isDone?"ok":"no")+'">'+(isDone?"Bestanden":"Offen")+'</span>';
 h+='</li>';
 }
 h+='</ul></div>';
 h+='<button class="logout" onclick="doLogout()">&#x1F6AA; Abmelden</button>';
-
-document.getElementById('app').innerHTML=h;
-/* URL bereinigen */
-window.history.replaceState({},'',window.location.pathname);
+document.getElementById("app").innerHTML=h;
+window.history.replaceState({},"",window.location.pathname);
 }
 
 function startQuiz(id){
 var t=null;
-for(var i=0;i<trainings.length;i++){if(trainings[i].id===id)t=trainings[i];}
-if(!t)return;
+for(var i=0;i<trainings.length;i++){if(trainings[i].id===id){t=trainings[i];}}
+if(!t){return;}
 var doneList=[];
-for(var k in completedIds){if(completedIds[k])doneList.push(k);}
+for(var k in completedIds){if(completedIds[k]){doneList.push(k);}}
 var url=GH+encodeURI(t.file)
-+'?ptb_fn='+encodeURIComponent(user.fn)
-+'&ptb_ln='+encodeURIComponent(user.ln)
-+'&ptb_dp='+encodeURIComponent(user.dp)
-+'&ptb_loc='+encodeURIComponent(user.loc)
-+'&ptb_em='+encodeURIComponent(user.em)
-+'&ptb_done='+encodeURIComponent(doneList.join(','));
++"?ptb_fn="+encodeURIComponent(user.fn)
++"&ptb_ln="+encodeURIComponent(user.ln)
++"&ptb_dp="+encodeURIComponent(user.dp)
++"&ptb_loc="+encodeURIComponent(user.loc)
++"&ptb_em="+encodeURIComponent(user.em)
++"&ptb_done="+encodeURIComponent(doneList.join(","));
 window.location.href=url;
 }
 
 function doLogout(){
-user=null;completedIds={};
-try{localStorage.removeItem('ptb_user');localStorage.removeItem('ptb_done');}catch(e){}
-window.history.replaceState({},'',window.location.pathname);
+user=null;
+completedIds={};
+try{localStorage.removeItem("ptb_user");localStorage.removeItem("ptb_done");}catch(e){}
+window.history.replaceState({},"",window.location.pathname);
 showLogin();
 }
 
 function saveResults(){
 try{
-localStorage.setItem('ptb_user',JSON.stringify(user));
-localStorage.setItem('ptb_done',JSON.stringify(completedIds));
+localStorage.setItem("ptb_user",JSON.stringify(user));
+localStorage.setItem("ptb_done",JSON.stringify(completedIds));
 }catch(e){}
 }
 
 function loadResults(){
 try{
-var u=localStorage.getItem('ptb_user');
-var d=localStorage.getItem('ptb_done');
-if(u)user=JSON.parse(u);
-if(d){var obj=JSON.parse(d);for(var k in obj){if(obj[k])completedIds[k]=obj[k];}}
-}catch(e){}
+var u=localStorage.getItem("ptb_user");
+var d=localStorage.getItem("ptb_done");
+if(u){user=JSON.parse(u);}
+if(d){var obj=JSON.parse(d);for(var k in obj){if(obj[k]){completedIds[k]=obj[k];}}}
+}catch(e){user=null;completedIds={};}
 }
 
 init();
