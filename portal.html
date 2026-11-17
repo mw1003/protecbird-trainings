@@ -88,7 +88,7 @@ function init(){
 var p=getParams();
 if(p.ptb_fn&&p.ptb_ln&&p.ptb_dp&&p.ptb_loc){
 user={fn:p.ptb_fn,ln:p.ptb_ln,dp:p.ptb_dp,loc:p.ptb_loc,em:p.ptb_em||''};
-trainings=user.loc.toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
+trainings=(user.loc||'').toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
 /* URL-Parameter auswerten */
 if(p.ptb_done){var d=p.ptb_done.split(',');for(var i=0;i<d.length;i++){if(d[i])completedIds[d[i]]=true;}}
 if(p.ptb_result&&p.ptb_passed==='true'){completedIds[p.ptb_result]=true;}
@@ -100,7 +100,7 @@ return;
 /* Lokalen Speicher pruefen */
 loadResults();
 if(user){
-trainings=user.loc.toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
+trainings=(user.loc||'').toLowerCase()==='oyten'?TRAININGS_FERTIGUNG:TRAININGS_BUERO;
 fetchStatus();
 }else{
 showLogin();
